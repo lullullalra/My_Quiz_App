@@ -2,7 +2,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/model/model_quiz.dart';
+import 'package:flutter_practice/screen/screen_result.dart';
 import 'package:flutter_practice/widget/widget_candidate.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -33,7 +35,7 @@ class _QuizScreenState extends State<QuizScreen>{
             border: Border.all(color: Colors.deepPurple),
             ),
             width: width * 0.85,
-            height: height * 0.5,
+            height: height * 0.6,
             child: Swiper(
               controller: _controller,
               physics: NeverScrollableScrollPhysics(),
@@ -93,7 +95,7 @@ class _QuizScreenState extends State<QuizScreen>{
             child: Center(
               child: ButtonTheme(
                 minWidth: width * 0.5,
-                height: height * 0.5,
+                height: height * 0.05,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10),
                 ),
                 child: RaisedButton(
@@ -103,8 +105,17 @@ class _QuizScreenState extends State<QuizScreen>{
                   textColor: Colors.white,
                   color: Colors.deepPurple,
                   onPressed: _answers[_currentIndex]== -1 ? null : (){
-                    if(_currentIndex == widget.quizs.length -1){}
-                    else{
+                    if(_currentIndex == widget.quizs.length -1){
+                     Navigator.push(
+                         context,
+                         MaterialPageRoute(
+                             builder: (context) => ResultScreen(
+                                 answers: _answers,
+                                 quizs: widget.quizs
+                             ),
+                         ),
+                     );
+                    }else{
                       _answerState = [false, false, false, false];
                       _currentIndex += 1;
                       _controller.next();
