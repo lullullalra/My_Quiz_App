@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/model/api_adapter.dart';
 import 'package:flutter_practice/model/model_quiz.dart';
 import 'package:flutter_practice/screen/screen_quiz.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,23 +11,42 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Quiz> quizs = [
-    Quiz.fromMap({
-      'title': 'test',
-      'candidates': ['a','b','c','d'],
-      'answer':0
-    }),
-    Quiz.fromMap({
-      'title': 'test',
-      'candidates': ['a','b','c','d'],
-      'answer':0
-    }),
-    Quiz.fromMap({
-      'title': 'test',
-      'candidates': ['a','b','c','d'],
-      'answer':0
-    }),
-  ];
+  List<Quiz> quizs = [];
+  bool isLoading = false;
+
+  _fetchQuizs() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    //aws에 djnago 서버 배포해서 url 변경하기
+    final response = await http.get("http://127.0.0.1:8000/quiz/3/");
+    if(response.statusCode == 200) {
+      setState(() {
+        quizs = parseQuizs(utf8.decode(response.bodyBytes));
+        isLoading = false;
+      });
+    } else{
+      throw Exception('falied to load data');
+    }
+  }
+  // List<Quiz> quizs = [
+  //   Quiz.fromMap({
+  //     'title': 'test',
+  //     'candidates': ['a','b','c','d'],
+  //     'answer':0
+  //   }),
+  //   Quiz.fromMap({
+  //     'title': 'test',
+  //     'candidates': ['a','b','c','d'],
+  //     'answer':0
+  //   }),
+  //   Quiz.fromMap({
+  //     'title': 'test',
+  //     'candidates': ['a','b','c','d'],
+  //     'answer':0
+  //   }),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -86,13 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                     color: Colors.deepPurple,
                     onPressed: () {
-                      Navigator.push(context,
+                      _fetchQuizs().whenComplete((){
+                        return Navigator.push(context,
                           MaterialPageRoute(
-                              builder: (context) => QuizScreen(
-                                  quizs: quizs,
-                              ),
+                            builder: (context) => QuizScreen(
+                              quizs: quizs,
+                            ),
                           ),
-                      );
+                        );
+                      });
                     },
                   ),
                 ),
